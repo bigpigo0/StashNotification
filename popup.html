@@ -1,0 +1,87 @@
+<html>
+<head>
+  <script src="scripts\angular.min.js"></script>
+  <script src="scripts\jquery-2.1.3.min.js"></script>
+  <script src="popup.js"></script>
+  <script src="scripts\bootstrap-3.3.4-dist\js\bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="popup.css" />
+  <link rel="stylesheet" href="scripts\bootstrap-3.3.4-dist\css\bootstrap.min.css">  
+  <style type="text/css">
+	table
+	{
+		table-layout: fixed;
+		font-size: 12px;
+		margin: 0 auto;
+	}
+  </style>
+</head>
+<body style="width: 500px" ng-app="stash">
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			Pending Approval
+		</div>
+			<table class="aui table table-hover table-condensed" id="table-pull-request" ng-controller="StashApprovalController as stashCtrl">
+				<tr>
+					<th>Source</th>
+					<th>Target</th>
+					<th style="width: 250px">Details</th>
+					<th>User</th>
+				</tr>			
+				<tr ng-show="stashCtrl.isError">
+					<td colspan="4" style="text-align: center"><a ng-href="{{ stashCtrl.homeUrl }}">Failed to get data, please check your Stash connection.</a></td>
+				</tr>	
+				<tr ng-show="stashCtrl.error.length">
+					<td colspan="4" style="text-align: center"><a ng-href="{{ stashCtrl.optionUrl }}">{{ stashCtrl.error }}</a></td>
+				</tr>				
+				<tr ng-show="stashCtrl.approvals.length == 0">
+					<td colspan="4" style="text-align: center">No Data</td>
+				</tr>
+				<tr ng-show="stashCtrl.isLoading">
+					<td colspan="4" style="text-align: center"><img ng-src="{{ stashCtrl.loadingGifSrc }}"></td>
+				</tr>
+				<tr ng-repeat="approval in stashCtrl.approvals">
+					<td><span class="label label-primary" style="line-height:15px;" ng-attr-title="{{ approval.fromRef.displayId }}">{{ approval.fromRef.displayId | limitTo: 13}}{{approval.fromRef.displayId.length > 13 ? '...' : ''}}</span></td>
+					<td><span class="label label-primary" style="line-height:15px;" ng-attr-title="{{ approval.toRef.displayId }}">{{ approval.toRef.displayId | limitTo: 13}}{{approval.toRef.displayId.length > 13 ? '...' : ''}}</span></td>
+					<td ng-hide="approval.description === undefined"><a ng-href="{{stashCtrl.homeUrl + approval.link.url}}" ng-attr-title="{{ approval.description }}">{{ approval.description | limitTo: 30 }}{{approval.description.length > 30 ? '...' : ''}}</a></td>
+					<td ng-show="approval.description === undefined"><a ng-href="{{stashCtrl.homeUrl + approval.link.url}}" ng-attr-title="{{ approval.title }}">{{ approval.title | limitTo: 30 }}{{approval.title.length > 30 ? '...' : ''}}</a></td>
+					<td><span class="label label-default" style="line-height:15px;">{{ approval.author.user.name}}</span></td>
+				</tr>				
+			</table>		
+	</div>
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			Pull Request
+		</div>
+			<table class="aui table table-hover table-condensed" id="table-pull-request-author" ng-controller="StashRequestController as stashCtrl">
+				<tr>
+					<th>Source</th>
+					<th>Target</th>
+					<th style="width: 250px">Details</th>
+					<th>Approved</th>
+				</tr>
+				<tr ng-show="stashCtrl.isError">
+					<td colspan="4" style="text-align: center"><a ng-href="{{ stashCtrl.homeUrl }}">Failed to get data, please check your Stash connection.</a></td>
+				</tr>
+				<tr ng-show="stashCtrl.error.length">
+					<td colspan="4" style="text-align: center"><a ng-href="{{ stashCtrl.optionUrl }}">{{ stashCtrl.error }}</a></td>
+				</tr>			
+				<tr ng-show="stashCtrl.requests.length == 0">
+					<td colspan="4" style="text-align: center">No Data</td>
+				</tr>
+				<tr ng-show="stashCtrl.isLoading">
+					<td colspan="4" style="text-align: center"><img ng-src="{{ stashCtrl.loadingGifSrc }}"></td>
+				</tr>
+				<tr ng-repeat="request in stashCtrl.requests">
+					<td><span class="label label-primary" style="line-height:15px;" ng-attr-title="{{ request.fromRef.displayId }}">{{ request.fromRef.displayId | limitTo: 13}}{{request.fromRef.displayId.length > 13 ? '...' : ''}}</span></td>
+					<td><span class="label label-primary" style="line-height:15px;" ng-attr-title="{{ request.toRef.displayId }}">{{ request.toRef.displayId | limitTo: 13}}{{request.toRef.displayId.length > 13 ? '...' : ''}}</span></td>
+					<td ng-hide="request.description === undefined"><a ng-href="{{stashCtrl.homeUrl + request.link.url}}" ng-attr-title="{{ request.description }}">{{ request.description | limitTo: 30 }}{{request.description.length > 30 ? '...' : ''}}</a></td>
+					<td ng-show="request.description === undefined"><a ng-href="{{stashCtrl.homeUrl + request.link.url}}" ng-attr-title="{{ request.title }}">{{ request.title | limitTo: 30 }}{{request.title.length > 30 ? '...' : ''}}</a></td>
+					<td><div ng-repeat="reviewer in request.reviewers"><span ng-show="reviewer.approved" class="label label-success" style="line-height:15px;">{{ reviewer.user.slug }}</span></div></td>
+				</tr>
+			</table>
+	</div>
+	<footer style="font-size: 10px; width: 100%; text-align: center; background-color: #F5F5F5" ng-controller="VersionController as versionCtrl">
+		version: <span>{{ versionCtrl.version }}</span>
+	</footer>
+</body>
+</html>
